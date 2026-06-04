@@ -1,0 +1,71 @@
+semantic_models:
+  - name: ar_ledger
+    description: Invoice-grain AR ledger for core finance metrics.
+    model: ref('fct_ar_ledger')
+    defaults:
+      agg_time_dimension: invoice_date
+    entities:
+      - name: invoice
+        type: primary
+        expr: invoice_id
+      - name: customer
+        type: foreign
+        expr: customer_id
+    dimensions:
+      - name: invoice_date
+        type: time
+        type_params:
+          time_granularity: day
+      - name: status
+        type: categorical
+      - name: aging_bucket
+        type: categorical
+      - name: source_system
+        type: categorical
+    measures:
+      - name: total_invoiced_usd
+        agg: sum
+        expr: amount_usd
+      - name: total_paid_usd
+        agg: sum
+        expr: amount_paid_usd
+      - name: total_outstanding_usd
+        agg: sum
+        expr: amount_outstanding_usd
+      - name: avg_days_outstanding
+        agg: average
+        expr: days_outstanding
+      - name: overdue_invoice_count
+        agg: sum
+        expr: case when is_overdue then 1 else 0 end
+
+metrics:
+  - name: days_sales_outstanding
+    label: DSO
+    description: Average days outstanding across non-paid invoices.
+    type: simple
+    type_params:
+      measure: avg_days_outstanding
+    filter: "{{ Dimension('invoice__status') }} != 'PAID'"
+
+  - name: collection_rate
+    label: Collection Rate
+    description: Ratio of paid dollars to invoiced dollars.
+    type: ratio
+    type_params:
+      numerator: total_paid_usd
+      denominator: total_invoiced_usd
+
+  - name: ar_outstanding
+    label: AR Outstanding
+    description: Total open accounts receivable balance.
+    type: simple
+    type_params:
+      measure: total_outstanding_usd
+
+  - name: overdue_invoice_count
+    label: Overdue Invoice Count
+    description: Number of invoices currently overdue.
+    type: simple
+    type_params:
+      measure: overdue_invoice_count

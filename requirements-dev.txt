@@ -1,0 +1,8 @@
+-r requirements.txt
+
+apache-airflow>=2.9
+dbt-core>=1.8
+dbt-duckdb>=1.8
+great-expectations>=0.18
+pytest>=8.2
+python-dotenv>=1.0

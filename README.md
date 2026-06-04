@@ -41,7 +41,7 @@ This pipeline solves that by:
                                │
                                ▼
 ┌─────────────────────────────────────────────────────────────────────┐
-│                    SNOWFLAKE RAW LAYER                              │
+│                    LOCAL DUCKDB RAW LAYER                           │
 │                                                                     │
 │  raw.erp_invoices    raw.payment_events    raw.product_events       │
 │  (_loaded_at, _source_system, _file_name on every table)           │
@@ -92,7 +92,7 @@ This pipeline solves that by:
 | Layer | Technology |
 |---|---|
 | Orchestration | Apache Airflow 2.x |
-| Data Warehouse | Snowflake |
+| Data Warehouse | DuckDB |
 | Transformation | dbt Core + MetricFlow |
 | Data Quality | Great Expectations + dbt tests |
 | Language | Python 3.11 |
@@ -162,7 +162,7 @@ stuut-ar-intelligence/
 │       ├── dbt_ci.yml                # PR: dbt build --select state:modified+ → test
 │       └── ge_validation.yml         # Post-merge: GE checkpoint run
 │
-├── docker-compose.yml                # Airflow + Snowflake proxy + Streamlit
+├── docker-compose.yml                # Airflow + DuckDB volume + Streamlit
 ├── Makefile                          # make ingest / make dbt / make dashboard / make test
 ├── requirements.txt
 └── docs/
@@ -176,7 +176,7 @@ stuut-ar-intelligence/
 
 ### Canonical Ingestion Type
 
-Every source system is normalized to a typed dataclass on ingest before touching Snowflake — no raw strings for critical fields.
+Every source system is normalized to a typed dataclass on ingest before touching the warehouse - no raw strings for critical fields.
 
 ```python
 @dataclass
@@ -326,8 +326,22 @@ Streamlit app with four views, served from the `mrt_collections_health` mart.
 
 ```bash
 # Run dashboard locally
-streamlit run dashboard/app.py
+streamlit run streamlit_app.py
 ```
+
+### Deploy On Streamlit Community Cloud
+
+This repo is ready for Streamlit Cloud auto-deploys. Use:
+
+- **Repository:** `sajansshergill/stuut-ar-intelligence`
+- **Branch:** `main`
+- **Main file path:** `streamlit_app.py`
+- **Python runtime:** configured in `runtime.txt`
+- **Dependencies:** configured in root `requirements.txt`
+
+The deployed app uses built-in sample portfolio data by default, so it does not require DuckDB, Airflow, dbt, or any secrets to boot. If you later upload a CSV/Parquet export or include a DuckDB file, the sidebar can point the dashboard at that data source.
+
+After the app is connected in Streamlit Cloud, every push to the selected branch redeploys automatically.
 
 ---
 
@@ -365,8 +379,7 @@ All DAGs are idempotent — safe to rerun, backfill, and replay without duplicat
 
 - Python 3.11+
 - Docker + docker-compose
-- Snowflake account (free trial works)
-- dbt Core (`pip install dbt-snowflake`)
+- dbt Core with DuckDB (`pip install dbt-duckdb`)
 
 ### Setup
 
@@ -375,10 +388,10 @@ All DAGs are idempotent — safe to rerun, backfill, and replay without duplicat
 git clone https://github.com/sajansshergill/stuut-ar-intelligence.git
 cd stuut-ar-intelligence
 pip install -r requirements.txt
+pip install -r requirements-dev.txt  # optional: Airflow, dbt, GE, tests
 
-# Configure Snowflake connection
-cp dbt/profiles.yml.example dbt/profiles.yml
-# Edit profiles.yml with your Snowflake credentials
+# Local DuckDB is used by default
+mkdir -p local
 
 # Start Airflow locally
 docker-compose up airflow-init
@@ -398,7 +411,7 @@ make test        # pytest tests/ + dbt test
 ## Key Design Decisions
 
 **Why one canonical dataclass before raw load?**
-Normalizing to `InvoiceRecord` / `PaymentEvent` at the Python layer catches type errors and schema drift before they reach Snowflake. This is cheaper to fix than discovering mismatches in dbt.
+Normalizing to `InvoiceRecord` / `PaymentEvent` at the Python layer catches type errors and schema drift before they reach DuckDB/dbt. This is cheaper to fix than discovering mismatches in transformations.
 
 **Why staging → intermediate → marts (not two layers)?**
 Intermediate models isolate the hairiest business logic — partial payment matching, aging bucket assignment — from both the raw typing (staging) and the final metric surfaces (marts). This makes the complex logic independently testable and easy to change when business rules evolve.
@@ -424,7 +437,7 @@ This project is built around standard B2B accounts receivable concepts:
 
 ## About This Project
 
-Built as a targeted portfolio project for the Data Engineer role at Stuut. The scope deliberately mirrors the JD: first data hire, greenfield architecture, AR/collections domain, modern DE stack (Airflow, dbt, Snowflake, GE), and an ML-ready feature layer.
+Built as a targeted portfolio project for the Data Engineer role at Stuut. The scope deliberately mirrors the JD: first data hire, greenfield architecture, AR/collections domain, modern DE stack (Airflow, dbt, DuckDB, GE), and an ML-ready feature layer.
 
 **Author:** Sajan Shergill
 **Contact:** sajansshergill@gmail.com · [linkedin.com/in/sajanshergill](https://linkedin.com/in/sajanshergill) · [sajansshergill.github.io](https://sajansshergill.github.io)

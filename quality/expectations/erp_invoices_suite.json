@@ -1,0 +1,31 @@
+{
+  "expectation_suite_name": "erp_invoices_suite",
+  "meta": {
+    "notes": "Raw ERP invoice data quality checks mirrored by quality/ge_suite.py and dbt tests."
+  },
+  "expectations": [
+    {
+      "expectation_type": "expect_column_values_to_not_be_null",
+      "kwargs": {"column": "invoice_id"}
+    },
+    {
+      "expectation_type": "expect_column_values_to_not_be_null",
+      "kwargs": {"column": "customer_id", "mostly": 0.999}
+    },
+    {
+      "expectation_type": "expect_column_values_to_be_between",
+      "kwargs": {"column": "amount_usd", "min_value": 0}
+    },
+    {
+      "expectation_type": "expect_column_values_to_be_in_set",
+      "kwargs": {
+        "column": "status",
+        "value_set": ["OPEN", "PARTIAL", "PAID", "OVERDUE", "DISPUTED"]
+      }
+    },
+    {
+      "expectation_type": "expect_column_values_to_match_regex",
+      "kwargs": {"column": "currency", "regex": "^[A-Z]{3}$"}
+    }
+  ]
+}

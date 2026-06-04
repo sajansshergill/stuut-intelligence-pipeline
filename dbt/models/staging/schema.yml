@@ -1,0 +1,109 @@
+version: 2
+
+sources:
+  - name: raw
+    schema: raw
+    tables:
+      - name: erp_invoices
+        loaded_at_field: _loaded_at
+        freshness:
+          warn_after: {count: 6, period: hour}
+          error_after: {count: 24, period: hour}
+      - name: payment_events
+        loaded_at_field: _loaded_at
+        freshness:
+          warn_after: {count: 2, period: hour}
+          error_after: {count: 12, period: hour}
+      - name: product_events
+        loaded_at_field: _loaded_at
+        freshness:
+          warn_after: {count: 2, period: hour}
+          error_after: {count: 12, period: hour}
+
+models:
+  - name: stg_erp_invoices
+    description: Cleaned and deduplicated ERP invoices from NetSuite, QuickBooks, and SAP.
+    columns:
+      - name: invoice_id
+        tests: [unique, not_null]
+      - name: customer_id
+        tests: [not_null]
+      - name: invoice_date
+        tests: [not_null]
+      - name: due_date
+        tests: [not_null]
+      - name: amount_usd
+        tests: [not_null]
+      - name: currency
+        tests: [not_null]
+      - name: status
+        tests:
+          - not_null
+          - accepted_values:
+              values: ['OPEN', 'PARTIAL', 'PAID', 'OVERDUE', 'DISPUTED']
+      - name: source_system
+        tests:
+          - not_null
+          - accepted_values:
+              values: ['netsuite', 'quickbooks', 'sap']
+
+  - name: stg_payments
+    description: Cleaned and deduplicated payment events.
+    columns:
+      - name: payment_id
+        tests: [unique, not_null]
+      - name: customer_id
+        tests: [not_null]
+      - name: payment_date
+        tests: [not_null]
+      - name: amount_usd
+        tests: [not_null]
+      - name: payment_method
+        tests:
+          - accepted_values:
+              values: ['ach', 'wire', 'credit_card', 'check', 'unknown']
+
+  - name: stg_product_events
+    description: Cleaned product collection touchpoints.
+    columns:
+      - name: event_id
+        tests: [unique, not_null]
+      - name: invoice_id
+        tests: [not_null]
+      - name: customer_id
+        tests: [not_null]
+      - name: event_type
+        tests:
+          - accepted_values:
+              values: ['email_sent', 'call_logged', 'reminder_triggered', 'dispute_opened']
+
+  - name: fct_ar_ledger
+    description: Invoice-grain AR fact table with payment and collections activity.
+    columns:
+      - name: invoice_id
+        tests: [unique, not_null]
+      - name: customer_id
+        tests:
+          - not_null
+          - relationships:
+              to: ref('dim_customers')
+              field: customer_id
+      - name: amount_outstanding_usd
+        tests: [not_null]
+
+  - name: dim_customers
+    description: Customer dimension with lifetime AR risk attributes.
+    columns:
+      - name: customer_id
+        tests: [unique, not_null]
+
+  - name: mrt_collections_health
+    description: Customer-level collections health mart for dashboard and reporting.
+    columns:
+      - name: customer_id
+        tests:
+          - unique
+          - not_null
+          - relationships:
+              to: ref('dim_customers')
+              field: customer_id
