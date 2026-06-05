@@ -1,0 +1,38 @@
+[
+  {
+    "event_id": "EVT-001",
+    "invoice_id": "NS-1001",
+    "customer_id": "CUST-001",
+    "event_type": "email_sent",
+    "occurred_at": "2026-02-06T09:30:00",
+    "actor": "system",
+    "outcome": "delivered"
+  },
+  {
+    "event_id": "EVT-002",
+    "invoice_id": "NS-1002",
+    "customer_id": "CUST-002",
+    "event_type": "call_logged",
+    "occurred_at": "2026-02-15T14:10:00",
+    "actor": "agent_17",
+    "outcome": "voicemail"
+  },
+  {
+    "event_id": "EVT-003",
+    "invoice_id": "NS-1002",
+    "customer_id": "CUST-002",
+    "event_type": "reminder_triggered",
+    "occurred_at": "2026-02-20T08:00:00",
+    "actor": "system",
+    "outcome": "delivered"
+  },
+  {
+    "event_id": "EVT-004",
+    "invoice_id": "QB-2002",
+    "customer_id": "CUST-004",
+    "event_type": "dispute_opened",
+    "occurred_at": "2026-03-24T16:25:00",
+    "actor": "agent_04",
+    "outcome": "opened"
+  }
+]

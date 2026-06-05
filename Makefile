@@ -1,4 +1,4 @@
-.PHONY: install install-dashboard test unit dbt dashboard ingest ge format-check
+.PHONY: install install-dashboard test unit dbt dashboard local-pipeline ingest ge format-check
 
 PYTHON ?= python3
 DBT_PROJECT_DIR ?= dbt
@@ -27,11 +27,14 @@ ge:
 dashboard:
 	streamlit run streamlit_app.py
 
+local-pipeline:
+	$(PYTHON) scripts/run_local_pipeline.py
+
 ingest:
 	airflow dags trigger erp_ingest_daily
 	airflow dags trigger payment_ingest_hourly
 
 format-check:
-	$(PYTHON) -m compileall ingestion features quality dags dashboard tests
+	$(PYTHON) -m compileall ingestion features quality dags dashboard scripts tests
 
 test: unit format-check

@@ -24,6 +24,10 @@ Staging handles casting, renaming, and deduplication. Intermediate models isolat
 
 The project uses `dbt-duckdb` and a local `local/ar_intelligence.duckdb` database instead of a managed warehouse. This keeps the portfolio project runnable without cloud credentials while preserving SQL/dbt modeling patterns.
 
-## ADR 007: Separate Fast PR Checks From Data-Dependent Checks
+## ADR 007: Record Lightweight Local Lineage
+
+Each local pipeline run writes row counts, source names, target tables, transformations, and run IDs into `metadata.pipeline_lineage`. This is not a full enterprise lineage graph, but it makes the local demo auditable enough to explain how raw source records become dashboard marts.
+
+## ADR 008: Separate Fast PR Checks From Data-Dependent Checks
 
 PR CI always runs Python unit tests and dbt compilation against the DuckDB profile. The scheduled GE workflow validates expectation suite integrity and is ready to expand into local DuckDB checkpoints.

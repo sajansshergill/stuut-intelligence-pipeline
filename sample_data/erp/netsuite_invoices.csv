@@ -1,0 +1,4 @@
+tranid,entity_id,entity_name,trandate,duedate,amount,currency,status,otherrefnum,line_count
+NS-1001,CUST-001,Acme Manufacturing,2026-01-05,2026-02-04,125000,USD,Open,PO-7001,8
+NS-1002,CUST-002,Northwind Industrial,2026-01-12,2026-02-11,210000,USD,Overdue,PO-7002,12
+NS-1003,CUST-003,Riverbend Parts,2026-02-15,2026-03-16,48000,USD,Open,PO-7003,4

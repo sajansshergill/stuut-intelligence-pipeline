@@ -329,6 +329,15 @@ Streamlit app with four views, served from the `mrt_collections_health` mart.
 streamlit run streamlit_app.py
 ```
 
+To build the local DuckDB demo first:
+
+```bash
+make local-pipeline
+streamlit run streamlit_app.py
+```
+
+The local pipeline reads sample ERP/payment/product event files from `sample_data/`, writes raw tables into `local/ar_intelligence.duckdb`, builds `analytics_marts.mrt_collections_health`, and records run lineage in `metadata.pipeline_lineage`.
+
 ### Deploy On Streamlit Community Cloud
 
 This repo is ready for Streamlit Cloud auto-deploys. Use:
@@ -398,6 +407,7 @@ docker-compose up airflow-init
 docker-compose up
 
 # Run full pipeline
+make local-pipeline # Build local DuckDB demo mart
 make ingest      # Trigger ERP + payment ingest DAGs
 make dbt         # dbt build + test
 make dashboard   # Launch Streamlit app

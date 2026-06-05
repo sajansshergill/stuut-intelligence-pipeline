@@ -1,0 +1,38 @@
+[
+  {
+    "event_id": "manual-pay-001",
+    "payment_id": "PAY-001",
+    "invoice_id": "NS-1001",
+    "customer_id": "CUST-001",
+    "payment_date": "2026-02-01",
+    "amount_usd": "83000",
+    "currency": "USD",
+    "payment_method": "ach",
+    "reference_number": "ACH-91201",
+    "is_partial": true
+  },
+  {
+    "event_id": "manual-pay-002",
+    "payment_id": "PAY-002",
+    "invoice_id": "NS-1003",
+    "customer_id": "CUST-003",
+    "payment_date": "2026-03-05",
+    "amount_usd": "48000",
+    "currency": "USD",
+    "payment_method": "wire",
+    "reference_number": "WIRE-66001",
+    "is_partial": false
+  },
+  {
+    "event_id": "manual-pay-003",
+    "payment_id": "PAY-003",
+    "invoice_id": "QB-2001",
+    "customer_id": "CUST-001",
+    "payment_date": "2026-03-04",
+    "amount_usd": "12000",
+    "currency": "USD",
+    "payment_method": "check",
+    "reference_number": "CHK-1442",
+    "is_partial": true
+  }
+]

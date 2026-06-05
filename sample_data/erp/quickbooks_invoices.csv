@@ -1,0 +1,3 @@
+doc_number,customer_ref,customer_name,txn_date,due_date,total_amt,currency,status,po_number,line_count
+QB-2001,CUST-001,Acme Manufacturing,2026-02-10,2026-03-12,36000,USD,Partially Paid,PO-7101,3
+QB-2002,CUST-004,Harbor Steel,2026-02-20,2026-03-22,92000,USD,Open,PO-7102,6
