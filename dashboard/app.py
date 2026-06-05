@@ -155,7 +155,7 @@ def main() -> None:
                 title="Outstanding AR by Aging Bucket",
                 labels={"bucket": "Aging bucket", "amount_usd": "Outstanding USD"},
             ),
-            use_container_width=True,
+            width="stretch",
         )
 
     with right:
@@ -172,13 +172,13 @@ def main() -> None:
                 values="total_outstanding_usd",
                 title="Outstanding AR by Risk Band",
             ),
-            use_container_width=True,
+            width="stretch",
         )
 
     st.subheader("Collections Health")
     st.dataframe(
         filtered.sort_values(["ar_risk_band", "overdue_outstanding_usd"], ascending=[True, False]),
-        use_container_width=True,
+        width="stretch",
         hide_index=True,
     )
 
@@ -194,7 +194,7 @@ def main() -> None:
             ],
         }
     )
-    st.plotly_chart(px.funnel(funnel, x="amount", y="stage"), use_container_width=True)
+    st.plotly_chart(px.funnel(funnel, x="amount", y="stage"), width="stretch")
 
     st.subheader("Customers To Prioritize")
     priority_columns = [
@@ -210,7 +210,7 @@ def main() -> None:
         filtered[priority_columns]
         .sort_values(["ar_risk_band", "overdue_outstanding_usd"], ascending=[True, False])
         .head(10),
-        use_container_width=True,
+        width="stretch",
         hide_index=True,
     )
 
